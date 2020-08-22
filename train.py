@@ -295,7 +295,7 @@ def main():
 
     best_seen_success_rate, best_unseen_success_rate = 0, 0
     for epoch in range(args.num_epochs):
-        # train
+        # train for one epoch
         train_epoch(
             epoch,
             model,
@@ -307,7 +307,7 @@ def main():
             args,
         )
 
-        # save model
+        # save the model every epoch
         if default_gpu:
             model_state = (
                 model.module.state_dict()
@@ -317,10 +317,11 @@ def main():
             model_path = os.path.join(save_path, f"pytorch_model_{epoch + 1}.bin")
             torch.save(model_state, model_path)
 
+        # run validation
         if not args.no_ranking:
             global_step = (epoch + 1) * len(train_data_loader)
 
-            # val_seen
+            # run validation on the "val seen" split
             with torch.no_grad():
                 seen_success_rate = val_epoch(
                     epoch,
@@ -337,16 +338,16 @@ def main():
                         f"[val_seen] epoch: {epoch + 1} success_rate: {seen_success_rate.item():.3f}"
                     )
 
+            # save the model that performs the best on val seen
             if seen_success_rate > best_seen_success_rate:
                 best_seen_success_rate = seen_success_rate
-                # save model
                 if default_gpu:
                     best_seen_path = os.path.join(
                         save_path, f"pytorch_model_best_seen.bin"
                     )
                     shutil.copyfile(model_path, best_seen_path)
 
-            # val_unseen
+            # run validation on the "val unseen" split
             with torch.no_grad():
                 unseen_success_rate = val_epoch(
                     epoch,
@@ -363,9 +364,9 @@ def main():
                         f"[val_unseen] epoch: {epoch + 1} success_rate: {unseen_success_rate.item():.3f}"
                     )
 
+            # save the model that performs the best on val unseen
             if unseen_success_rate > best_unseen_success_rate:
                 best_unseen_success_rate = unseen_success_rate
-                # save model
                 if default_gpu:
                     best_unseen_path = os.path.join(
                         save_path, f"pytorch_model_best_unseen.bin"
@@ -385,7 +386,6 @@ def train_epoch(
 ):
     device = next(model.parameters()).device
 
-    # train
     model.train()
     for step, batch in enumerate(data_loader):
         # load batch on gpu
@@ -448,6 +448,7 @@ def train_epoch(
         reduced_correct = correct.detach()
         reduced_batch_size = torch.tensor(batch_size, device=device)
 
+        # TODO: skip this `all_reduce` to speed-up runtime
         if args.local_rank != -1:
             reduced_vision_loss /= dist.get_world_size()
             reduced_linguistic_loss /= dist.get_world_size()
@@ -460,6 +461,7 @@ def train_epoch(
             dist.all_reduce(reduced_correct, op=dist.ReduceOp.SUM)
             dist.all_reduce(reduced_batch_size, op=dist.ReduceOp.SUM)
 
+        # write stats to tensorboard
         if default_gpu:
             global_step = step + epoch * len(data_loader)
             writer.add_scalar("loss/train", reduced_loss, global_step=global_step)
@@ -533,6 +535,7 @@ def val_epoch(epoch, model, tag, data_loader, writer, default_gpu, args, global_
     if args.local_rank != -1:
         dist.all_reduce(stats, op=dist.ReduceOp.SUM)
 
+    # write stats to tensorboard
     if default_gpu:
         writer.add_scalar(
             f"loss/bce_{tag}", stats[0] / stats[2], global_step=global_step

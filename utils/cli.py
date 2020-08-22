@@ -114,15 +114,15 @@ def get_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--warmup_proportion",
-        default=0.04,
+        default=0.2,
         type=float,
-        help="Percentage of training to perform a linear lr warmup (default: 0.04)",
+        help="Percentage of training to perform a linear lr warmup (default: 0.2)",
     )
     parser.add_argument(
         "--cooldown_factor",
-        default=4.0,
+        default=2.0,
         type=float,
-        help="Multiplicative factor applied to the learning rate cooldown slope (default: 4.0)",
+        help="Multiplicative factor applied to the learning rate cooldown slope (default: 2.0)",
     )
     parser.add_argument(
         "--weight_decay",

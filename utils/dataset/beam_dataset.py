@@ -20,11 +20,6 @@ from utils.dataset.common import (
 )
 from utils.dataset.pano_features_reader import PanoFeaturesReader
 
-logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
-    datefmt="%m/%d/%Y %H:%M:%S",
-    level=logging.INFO,
-)
 logger = logging.getLogger(__name__)
 
 

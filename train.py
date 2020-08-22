@@ -2,6 +2,7 @@ import logging
 import os
 import random
 import shutil
+import sys
 from datetime import datetime
 
 import numpy as np
@@ -31,6 +32,7 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s -   %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
     level=logging.INFO,
+    stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 

@@ -6,12 +6,20 @@ from vilbert.vilbert import BertModel, BertPreTrainedModel, BertPreTrainingHeads
 class VLNBert(BertPreTrainedModel):
     def __init__(self, config, dropout_prob=0.1):
         super().__init__(config)
+
+        # vision and language processing streams
         self.bert = BertModel(config)
-        self.dropout = torch.nn.Dropout(dropout_prob)
+
+        # pre-training heads
         self.cls = BertPreTrainingHeads(
             config, self.bert.embeddings.word_embeddings.weight
         )
+
+        # path selection head
         self.vil_logit = torch.nn.Linear(config.bi_hidden_size, 1)
+
+        # misc
+        self.dropout = torch.nn.Dropout(dropout_prob)
         self.fusion_method = config.fusion_method
         self.apply(self.init_bert_weights)
 

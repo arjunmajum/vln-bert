@@ -43,7 +43,7 @@ def main():
     # ----- #
 
     # command line parsing
-    parser = get_parser()
+    parser = get_parser(training=True)
     args = parser.parse_args()
 
     # validate command line arguments
@@ -54,12 +54,13 @@ def main():
         )
 
     # set seed
-    seed = args.seed
-    if args.local_rank != -1:
-        seed += args.local_rank
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-    random.seed(seed)
+    if args.seed:
+        seed = args.seed
+        if args.local_rank != -1:
+            seed += args.local_rank
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
 
     # get device settings
     if args.local_rank == -1:
@@ -79,10 +80,9 @@ def main():
         default_gpu = False
 
     # create output directory
-    save_suffix = f"run-{args.save_name}"
-    save_path = os.path.join(args.output_dir, save_suffix)
-    if default_gpu and not os.path.exists(save_path):
-        os.makedirs(save_path)
+    save_folder = os.path.join(args.output_dir, f"run-{args.save_name}")
+    if default_gpu and not os.path.exists(save_folder):
+        os.makedirs(save_folder)
 
     # ------------ #
     # data loaders #
@@ -272,9 +272,9 @@ def main():
     # before training #
     # --------------- #
 
-    # save all the hidden parameters
+    # save the parameters
     if default_gpu:
-        with open(os.path.join(save_path, "config.txt"), "w") as fid:
+        with open(os.path.join(save_folder, "config.txt"), "w") as fid:
             print(f"{datetime.now()}", file=fid)
             print("\n", file=fid)
             print(vars(args), file=fid)
@@ -283,7 +283,9 @@ def main():
 
     # loggers
     if default_gpu:
-        writer = SummaryWriter(logdir=os.path.join(save_path, "logging"), flush_secs=30)
+        writer = SummaryWriter(
+            logdir=os.path.join(save_folder, "logging"), flush_secs=30
+        )
     else:
         writer = None
 
@@ -316,7 +318,7 @@ def main():
                 if hasattr(model, "module")
                 else model.state_dict()
             )
-            model_path = os.path.join(save_path, f"pytorch_model_{epoch + 1}.bin")
+            model_path = os.path.join(save_folder, f"pytorch_model_{epoch + 1}.bin")
             torch.save(model_state, model_path)
 
         # run validation
@@ -345,7 +347,7 @@ def main():
                 best_seen_success_rate = seen_success_rate
                 if default_gpu:
                     best_seen_path = os.path.join(
-                        save_path, f"pytorch_model_best_seen.bin"
+                        save_folder, "pytorch_model_best_seen.bin"
                     )
                     shutil.copyfile(model_path, best_seen_path)
 
@@ -371,7 +373,7 @@ def main():
                 best_unseen_success_rate = unseen_success_rate
                 if default_gpu:
                     best_unseen_path = os.path.join(
-                        save_path, f"pytorch_model_best_unseen.bin"
+                        save_folder, "pytorch_model_best_unseen.bin"
                     )
                     shutil.copyfile(model_path, best_unseen_path)
 

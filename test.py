@@ -63,7 +63,7 @@ def main():
     )
     dataset = BeamDataset(
         vln_path=f"data/task/R2R_{args.split}.json",
-        beam_path=f"data/beamsearch/{args.split}.json",
+        beam_path=f"data/beamsearch/beams_{args.split}.json",
         tokenizer=tokenizer,
         pano_features_reader=features_reader,
         max_instruction_length=args.max_instruction_length,
@@ -107,8 +107,8 @@ def main():
 
     # covert scores into results format
     all_results = convert_scores(
-        scores=all_scores,
-        beam_path=f"data/beamsearch/{args.split}.json",
+        all_scores=all_scores,
+        beam_path=f"data/beamsearch/beams_{args.split}.json",
         add_exploration_path=args.split == "test",
     )
 

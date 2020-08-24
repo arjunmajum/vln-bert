@@ -99,7 +99,7 @@ def main():
             logger.info("using provided training trajectories")
         TrainDataset = BeamDataset
         vln_path = "data/task/R2R_train.json"
-        beam_path = "data/beamsearch/train.json"
+        beam_path = "data/beamsearch/beams_train.json"
     else:  # args.training_mode == "sampled":
         if default_gpu:
             logger.info("using sampled training trajectories")
@@ -125,7 +125,7 @@ def main():
 
     val_seen_dataset = BeamDataset(
         vln_path="data/task/R2R_val_seen.json",
-        beam_path="data/beamsearch/val_seen.json",
+        beam_path="data/beamsearch/beams_val_seen.json",
         tokenizer=tokenizer,
         pano_features_reader=features_reader,
         max_instruction_length=args.max_instruction_length,
@@ -141,7 +141,7 @@ def main():
 
     val_unseen_dataset = BeamDataset(
         vln_path="data/task/R2R_val_unseen.json",
-        beam_path="data/beamsearch/val_unseen.json",
+        beam_path="data/beamsearch/beams_val_unseen.json",
         tokenizer=tokenizer,
         pano_features_reader=features_reader,
         max_instruction_length=args.max_instruction_length,

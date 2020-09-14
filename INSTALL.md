@@ -39,13 +39,13 @@ After following the steps above the `data` directory should look like this:
 
 ```
 data/
-	beamsearch/
-	config/
-	connectivity/
-	distances/
-	logs/
-	matterport-ResNet-101-faster-rcnn-genome.lmdb
-	models/
-	runs/
-	task/
+  beamsearch/
+  config/
+  connectivity/
+  distances/
+  logs/
+  matterport-ResNet-101-faster-rcnn-genome.lmdb
+  models/
+  runs/
+  task/
 ```

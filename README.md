@@ -18,7 +18,7 @@ A variety of pretrained VLN-BERT weights can accessed through the following link
 
 ## Usage Instructions
 
-Follow the instructions in [Install.md](INSTALL.md) to setup this codebase.
+Follow the instructions in [INSTALL.md](INSTALL.md) to setup this codebase.
 The instructions walk you through several steps including preprocessing the
 Matterport3D panoramas by extracting regions with a pretrained object
 detector.

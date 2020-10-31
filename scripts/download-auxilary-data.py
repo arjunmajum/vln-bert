@@ -1,7 +1,12 @@
 import argparse
+import json
 import os
 import shutil
 from urllib.request import urlopen
+
+import networkx as nx
+import numpy as np
+from tqdm import tqdm
 
 BEAMSEARCH_LINKS = [
     (
@@ -153,24 +158,67 @@ def _download_url_to_file(url, path):
     print(f"downloading {url}... done!")
 
 
+def _load_nav_graph(scan):
+    """ Load connectivity graph for scan """
+
+    def distance(pose1, pose2):
+        """ Euclidean distance between two graph poses """
+        return (
+            (pose1["pose"][3] - pose2["pose"][3]) ** 2
+            + (pose1["pose"][7] - pose2["pose"][7]) ** 2
+            + (pose1["pose"][11] - pose2["pose"][11]) ** 2
+        ) ** 0.5
+
+    with open(f"data/connectivity/{scan}_connectivity.json") as f:
+        G = nx.Graph()
+        positions = {}
+        data = json.load(f)
+        for i, item in enumerate(data):
+            if item["included"]:
+                for j, conn in enumerate(item["unobstructed"]):
+                    if conn and data[j]["included"]:
+                        positions[item["image_id"]] = np.array(
+                            [item["pose"][3], item["pose"][7], item["pose"][11]]
+                        )
+                        assert data[j]["unobstructed"][i], "Graph should be undirected"
+                        G.add_edge(
+                            item["image_id"],
+                            data[j]["image_id"],
+                            weight=distance(item, data[j]),
+                        )
+        nx.set_node_attributes(G, values=positions, name="position")
+    return G
+
+
+def _generate_distances(scan):
+    g = _load_nav_graph(scan)
+    d = dict(nx.all_pairs_dijkstra_path_length(g))
+    with open(f"data/distances/{scan}_distances.json", "w") as fid:
+        json.dump(d, fid)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--beamsearch", action="store_true", help="only download beamsearch files"
+        "--beamsearch", action="store_true", help="only download beamsearch data"
     )
     parser.add_argument(
-        "--config", action="store_true", help="only download config file"
+        "--config", action="store_true", help="only download configuration files"
     )
     parser.add_argument(
-        "--connectivity", action="store_true", help="only download connectivity files"
+        "--connectivity", action="store_true", help="only download connectivity data"
     )
-    parser.add_argument("--task", action="store_true", help="only download task files")
+    parser.add_argument(
+        "--distances", action="store_true", help="only generate distance data"
+    )
+    parser.add_argument("--task", action="store_true", help="only download task data")
     args = parser.parse_args()
 
     download_all = (
         not args.beamsearch
         and not args.config
         and not args.connectivity
+        and not args.distances
         and not args.task
     )
 
@@ -187,6 +235,14 @@ if __name__ == "__main__":
             path = f"data/connectivity/{fname}"
             url = f"{CONNECTIVITY_ROOT_URL}/{fname}"
             _download_url_to_file(url, path)
+
+    if download_all or args.distances:
+        print("generating distance data...")
+        os.makedirs("data/distances", exist_ok=True)
+        scans = open("data/connectivity/scans.txt", "r").read().splitlines()
+        for scan in tqdm(scans):
+            _generate_distances(scan)
+        print("generating distance data... done!")
 
     if download_all or args.task:
         for path, url in TASK_LINKS:

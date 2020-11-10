@@ -65,7 +65,7 @@ To evaluate a pre-trained model, run:
 
 ```
 python test.py \
---split [val_seen | val_unseen] \
+--split [val_seen|val_unseen] \
 --from_pretrained <path/to/run_[run_id]_pytorch_model.bin> \
 --save_name [run_id]
 ```
@@ -73,7 +73,7 @@ python test.py \
 followed by:
 
 ```
-python scripts/calculate-metrics.py <path/to/results_[val_seen | val_unseen].json>
+python scripts/calculate-metrics.py <path/to/results_[val_seen|val_unseen].json>
 ```
 
 ## Citation

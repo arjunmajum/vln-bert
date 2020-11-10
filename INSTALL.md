@@ -27,11 +27,16 @@
    ```
    python scripts/download-auxilary-data.py
    ```
+
 2. Next, precompute image features using
    [bottom-up-attention](https://github.com/peteanderson80/bottom-up-attention)
    (i.e., Faster R-CNN pretrained on Visual Genome) from panos in the
    Matterport3D dataset. Follow the steps outlined in
    [scripts/matterport3D-updown-features/README.md](scripts/matterport3D-updown-features/README.md).
+
+   Alternatively, you can download and extract the the data from here:
+
+   [matterport-ResNet-101-faster-rcnn-genome.lmdb [13.8 GB]](https://dl.dropbox.com/s/67k2vjgyjqel6og/matterport-ResNet-101-faster-rcnn-genome.lmdb.zip)
 
 ## Verify the directory structure
 

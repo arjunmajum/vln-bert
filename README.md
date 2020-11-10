@@ -36,7 +36,7 @@ python \
 --node_rank=0 \
 train.py \
 --from_pretrained <path/to/vilbert_pytorch_model_9.bin> \
---save_name [PRE_TRAIN_RUN_ID] \
+--save_name [pre_train_run_id] \
 --num_epochs 50 \
 --warmup_proportion 0.08 \
 --cooldown_factor 8 \
@@ -55,7 +55,7 @@ python \
 --node_rank=0 \
 train.py \
 --from_pretrained <path/to/pytorch_model_50.bin> \
---save_name [FINE_TUNE_RUN_ID]
+--save_name [fine_tune_run_id]
 ```
 
 

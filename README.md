@@ -6,7 +6,7 @@ Paper: https://arxiv.org/abs/2004.14973
 
 ## Model Zoo
 
-A variety of pretrained VLN-BERT weights can accessed through the following links:
+A variety of pre-trained VLN-BERT weights can accessed through the following links:
 
 | |Pre-training Stages|Job ID|Val Unseen SR|URL|
 |-|:-------------:|:----:|:-----------:|:-:|
@@ -22,6 +22,59 @@ Follow the instructions in [INSTALL.md](INSTALL.md) to setup this codebase.
 The instructions walk you through several steps including preprocessing the
 Matterport3D panoramas by extracting regions with a pretrained object
 detector.
+
+### Training
+
+To preform stage 3 of pre-training, first download ViLBERT weights from
+[here](https://dl.dropbox.com/s/vjilqowlaobsxc6/vilbert_pytorch_model_9.bin).
+Then, run:
+```
+python \
+-m torch.distributed.launch \
+--nproc_per_node=8 \
+--nnodes=1 \
+--node_rank=0 \
+train.py \
+--from_pretrained <path/to/vilbert_pytorch_model_9.bin> \
+--save_name [PRE_TRAIN_RUN_ID] \
+--num_epochs 50 \
+--warmup_proportion 0.08 \
+--cooldown_factor 8 \
+--masked_language \
+--masked_vision \
+--no_ranking
+```
+
+To fine-tune VLN-BERT for the path selection task, run:
+
+```
+python \
+-m torch.distributed.launch \
+--nproc_per_node=8 \
+--nnodes=1 \
+--node_rank=0 \
+train.py \
+--from_pretrained <path/to/pytorch_model_50.bin> \
+--save_name [FINE_TUNE_RUN_ID]
+```
+
+
+### Evaluation
+
+To evaluate a pre-trained model, run:
+
+```
+python test.py \
+--split [val_seen | val_unseen] \
+--from_pretrained <path/to/run_[run_id]_pytorch_model.bin> \
+--save_name [run_id]
+```
+
+followed by:
+
+```
+python scripts/calculate-metrics.py <path/to/results_[val_seen | val_unseen].json>
+```
 
 ## Citation
 

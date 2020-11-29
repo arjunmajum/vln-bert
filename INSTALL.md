@@ -12,11 +12,12 @@
    conda create -n vlnbert python=3.6
    conda activate vlnbert
    ```
-3. Install NVIDIA Apex by following their [quick start](https://github.com/nvidia/apex#quick-start) instructions.
-4. Install additional requirements:
+3. Install additional requirements:
    ```
    pip install -r requirements.txt
    ```
+4. Install NVIDIA Apex by following their [quick start](https://github.com/nvidia/apex#quick-start) instructions.
+
 
 ## Data Preprocessing
 
@@ -25,7 +26,7 @@
    required configuration files is to run the following command:
 
    ```
-   python scripts/download-auxilary-data.py
+   python scripts/download-auxiliary-data.py
    ```
 
 2. Next, precompute image features using

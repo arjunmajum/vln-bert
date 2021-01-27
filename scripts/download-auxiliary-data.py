@@ -25,6 +25,18 @@ BEAMSEARCH_LINKS = [
         "data/beamsearch/beams_val_unseen.json",
         "https://dl.dropbox.com/s/5m5by9ralaim5nb/beams_val_unseen.json",
     ),
+    (
+        "data/beamsearch/scores_test.json",
+        "https://dl.dropbox.com/s/49u8vp01sbh9nfl/scores_test.json",
+    ),
+    (
+        "data/beamsearch/scores_val_seen.json",
+        "https://dl.dropbox.com/s/fx4o7ob23h4ei9k/scores_val_seen.json",
+    ),
+    (
+        "data/beamsearch/scores_val_unseen.json",
+        "https://dl.dropbox.com/s/aggdqj19ruttkci/scores_val_unseen.json",
+    ),
 ]
 
 CONFIG_LINKS = [
